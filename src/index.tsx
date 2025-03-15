@@ -3,14 +3,19 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import ProjectManager from './ProjectManager';
+import StoryList from './StoryList';
+import UserProfile from './UserProfile';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
+    <UserProfile/>
     <ProjectManager />
+  
   </React.StrictMode>
+
 );
 
 // If you want to start measuring performance in your app, pass a function

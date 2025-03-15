@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
+
 import { LocalStorageAPI } from "./LocalStorageAPI";
 import { Project } from "./Project";
-
+import StoryList from "./StoryList";
+import ActiveProject from "./ActiveProjects";
 
 const ProjectManager = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const api = new LocalStorageAPI();
   const [name, setName] = useState<string>(""); // State for project name
   const [description, setDescription] = useState<string>("");
+  
 
   useEffect(() => {
     setProjects(api.getProjects());
@@ -28,6 +31,7 @@ const ProjectManager = () => {
     setProjects(api.getProjects());
   };
 
+ 
   return (
     <div>
       <h1>ManagMe</h1>
@@ -49,10 +53,15 @@ const ProjectManager = () => {
           <li key={project.id}>
             <strong>{project.name}</strong>: {project.description}
             <button onClick={() => handleDeleteProject(project.id)}>Usuń</button>
+           
           </li>
         ))}
       </ul>
+      
+      <ActiveProject projects={projects} /> 
     </div>
+    
+ 
   );
 };
 
