@@ -1,0 +1,87 @@
+/* Ogólne style dla całego komponentu */
+.kanban-board {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background-color: #f0f4f8;
+    border-radius: 10px;
+  }
+  
+  /* Style dla każdej kolumny */
+  .kanban-column {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    width: 300px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .kanban-column h4 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+    text-transform: uppercase;
+    text-align: center;
+    border-bottom: 2px solid #4a90e2;
+    padding-bottom: 5px;
+  }
+  
+  /* Lista zadań */
+  .kanban-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Pojedyncze zadanie */
+  .kanban-task {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #fafafa;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .kanban-task strong {
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .kanban-task p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  /* Brak przypisanego użytkownika */
+  .kanban-task .unassigned {
+    color: #e74c3c;
+    font-weight: bold;
+  }
+  
+  /* Styl przycisków */
+  .button {
+    display: inline-block;
+    margin: 5px 0;
+    padding: 7px 15px;
+    border-radius: 5px;
+    border: none;
+    background-color: #4a90e2;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .button:hover {
+    background-color: #357ab8;
+  }
+  
+  /* Przycisk "nieaktywna kolumna" */
+  .button.disabled {
+    background-color: #ddd;
+    color: #aaa;
+    cursor: not-allowed;
+  }
+  
