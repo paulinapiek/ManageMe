@@ -14,7 +14,7 @@ export class UserManager {
     { id: "3", firstName: "Piotr", lastName: "Wiśniewski", role: "devops" },
   ];
 
-  private currentUserId: string = "2";
+  private currentUserId: string = "1";
 
   getUser(): User | null {
     const user = this.users.find(user => user.id === this.currentUserId);

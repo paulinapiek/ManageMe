@@ -1,106 +1,132 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-//import axios from "axios";
 import { Story } from "./Story";
+import { Task } from "./Task";
 
-// Define API URL (update with your actual endpoint)
-//const API_URL = "https://api.example.com/stories";
-
-// Create a context for StoryManager
+// Define the context for StoryManager
 const StoryContext = createContext<{
   stories: Story[];
-  fetchStories: () => Promise<void>;
-  addStory: (story: Story) => Promise<void>;
-  updateStory: (story: Story,  state : "to do" | "doing" | "done") => Promise<void>;
-  deleteStory: (storyId: string) => Promise<void>;
+  tasks: Task[];
+  fetchStories: () => void;
+  fetchTasks: () => void;
+  addStory: (story: Story) => void;
+  addTask: (task: Task) => void;
+  updateStory: (story: Story) => void;
+  updateTask: (task: Task, state: "to do" | "doing" | "done") => void;
+  deleteStory: (storyId: string) => void;
+  deleteTask: (taskId: string) => void;
 } | null>(null);
 
 export const StoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [stories, setStories] = useState<Story[]>([]);
-  const [key, setKey] = useState<string>("stories");
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const storyKey = "stories";
+  const taskKey = "tasks";
 
-  // Fetch all stories from the API
-  const fetchStories = async () => {
-    const data = localStorage.getItem(key);
-    
+  // Fetch all stories from storage
+  const fetchStories = () => {
+    const data = localStorage.getItem(storyKey);
     const result = data ? JSON.parse(data) : [];
     setStories(result);
     return result;
-    // try {
-    //   const response = await axios.get<Story[]>(API_URL);
-    //   setStories(response.data);
-    // } catch (error) {
-    //   console.error("Error fetching stories:", error);
-    // }
   };
 
-  // Add a new story to the API
-  const addStory = async (newStory: Story) => {
-    const stories = await fetchStories();
+  // Fetch all tasks from storage
+  const fetchTasks = () => {
+    const data = localStorage.getItem(taskKey);
+    const result = data ? JSON.parse(data) : [];
+    setTasks(result);
+    return result;
+  };
+
+  // Add a new story
+  const addStory = (newStory: Story) => {
+    const stories = fetchStories();
     stories.push(newStory);
-    localStorage.setItem(key, JSON.stringify(stories));
-    // try {
-    //   await axios.post(API_URL, newStory);
-    //   await fetchStories(); // Refresh stories after adding
-    // } catch (error) {
-    //   console.error("Error adding story:", error);
-    // }
+    localStorage.setItem(storyKey, JSON.stringify(stories));
+    setStories(stories);
   };
 
-  // Update a story in the API
-  const updateStory = async (updatedStory: Story, state : "to do" | "doing" | "done") => {
-    const stories = (await fetchStories()).map((story:  Story) => {
-     if ( story.id === updatedStory.id )      
-    { 
-      if (state === "doing" && !updatedStory.startDate) {
-           updatedStory.state = "doing"
-        updatedStory.startDate = new Date().toISOString();
-          }
-          
-          if (state === "done" && !updatedStory.completedDate) {
-             updatedStory.state = "done"
-            updatedStory.completedDate = new Date().toISOString();
-          }
-return updatedStory;
-    }
-     else {
+  // Add a new task
+  const addTask = (newTask: Task) => {
+    const tasks = fetchTasks();
+    tasks.push(newTask);
+    localStorage.setItem(taskKey, JSON.stringify(tasks));
+  };
+
+  // Update a story
+  const updateStory = (updatedStory: Story) => {
+    const stories = (fetchStories()).map((story: { id: string; }) => {
+       if (story.id === updatedStory.id) {
+      //   if (state === "doing" && !updatedStory.startDate) {
+      //     updatedStory.state = "doing";
+      //     updatedStory.startDate = new Date().toISOString();
+      //   }
+      //   if (state === "done" && !updatedStory.completedDate) {
+      //     updatedStory.state = "done";
+      //     updatedStory.completedDate = new Date().toISOString();
+      //   }
+         return updatedStory;
+      }
       return story;
-     }
-  });
-    localStorage.setItem(key, JSON.stringify(stories));
-    // try {
-    //         if (updatedStory.state === "doing" && !updatedStory.startDate) {
-    //     updatedStory.startDate = new Date().toISOString();
-    //   }
-    //   if (updatedStory.state === "done" && !updatedStory.completedDate) {
-    //     updatedStory.completedDate = new Date().toISOString();
-    //   }
-    //   await axios.put(`${API_URL}/${updatedStory.id}`, updatedStory);
-    //   await fetchStories(); // Refresh stories after updating
-    // } catch (error) {
-    //   console.error("Error updating story:", error);
-    // }
+    });
+    localStorage.setItem(storyKey, JSON.stringify(stories));
+    setStories(stories);
+
   };
 
-  // Delete a story from the API
-  const deleteStory = async (storyId: string) => {
-    const stories = (await fetchStories()).filter((story: Story) => story.id !== storyId);
-    localStorage.setItem(key, JSON.stringify(stories));
-    // try {
-    //   await axios.delete(`${API_URL}/${storyId}`);
-    //   await fetchStories(); // Refresh stories after deleting
-    // } catch (error) {
-    //   console.error("Error deleting story:", error);
-    // }
+  // Update a task
+  const updateTask = (updatedTask: Task, state: "to do" | "doing" | "done") => {
+    const tasks = (fetchTasks()).map((task: { id: string; }) => {
+      if (task.id === updatedTask.id) {
+        if (state === "doing" && !updatedTask.startDate) {
+          updatedTask.state = "doing";
+          updatedTask.startDate = new Date().toISOString();
+        }
+        if (state === "done" && !updatedTask.completedDate) {
+          updatedTask.state = "done";
+          updatedTask.completedDate = new Date().toISOString();
+        }
+        return updatedTask;
+      }
+      return task;
+    });
+    localStorage.setItem(taskKey, JSON.stringify(tasks));
+  };
+
+  // Delete a story and its associated tasks
+  const deleteStory =  (storyId: string) => {
+    const stories = (fetchStories()).filter((story: { id: string; }) => story.id !== storyId);
+    localStorage.setItem(storyKey, JSON.stringify(stories));
+
+    const tasks = (fetchTasks()).filter((task: { storyId: string; }) => task.storyId !== storyId);
+    localStorage.setItem(taskKey, JSON.stringify(tasks));
+    setStories(stories);
+  };
+
+  // Delete a task
+  const deleteTask = (taskId: string) => {
+    const tasks = fetchTasks().filter((task: { id: string; }) => task.id !== taskId);
+    localStorage.setItem(taskKey, JSON.stringify(tasks));
   };
 
   return (
-    <StoryContext.Provider value={{ stories, fetchStories, addStory, updateStory, deleteStory }}>
+    <StoryContext.Provider value={{
+      stories,
+      tasks,
+      fetchStories,
+      fetchTasks,
+      addStory,
+      addTask,
+      updateStory,
+      updateTask,
+      deleteStory,
+      deleteTask,
+    }}>
       {children}
     </StoryContext.Provider>
   );
 };
 
-// Hook to use the StoryManager context
 export const useStoryManager = () => {
   const context = useContext(StoryContext);
   if (!context) {

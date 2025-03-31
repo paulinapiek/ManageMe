@@ -37,13 +37,13 @@ const ProjectManager = () => {
       <h1>ManagMe</h1>
       <input
         type="text"
-        placeholder="Project Name"
+        placeholder="Nazwa projektu"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
       <input
         type="text"
-        placeholder="Project Description"
+        placeholder="Opis projektu"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />

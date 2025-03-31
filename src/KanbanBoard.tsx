@@ -1,46 +1,39 @@
 import React from "react";
-import { Story } from "./Story";
+import { Task } from "./Task";
 
 interface KanbanBoardProps {
-  stories: Story[];
-  onUpdateStoryState: (story: Story, newState: "to do" | "doing" | "done") => void;
+  tasks: Task[];
+  onUpdateTaskState: (task: Task, newState: "to do" | "doing" | "done") => void;
+  editTask: (taskId: string)=>void;
+  deleteTask: (taskId: string)=> void;
 }
 
-const KanbanBoard: React.FC<KanbanBoardProps> = ({ stories, onUpdateStoryState }) => {
-  const groupedStories = {
-    "to do": stories.filter(story => story.state === "to do"),
-    doing: stories.filter(story => story.state === "doing"),
-    done: stories.filter(story => story.state === "done"),
+const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onUpdateTaskState , editTask, deleteTask}) => {
+  const groupedTasks = {
+    "to do": tasks.filter(task => task.state === "to do"),
+    doing: tasks.filter(task => task.state === "doing"),
+    done: tasks.filter(task => task.state === "done"),
   };
 
   return (
     <div style={{ display: "flex", gap: "20px" }}>
-      {Object.entries(groupedStories).map(([state, stateStories]) => (
+      {Object.entries(groupedTasks).map(([state, stateTasks]) => (
         <div key={state} style={{ border: "1px solid black", padding: "10px", width: "300px" }}>
           <h4>{state.toUpperCase()}</h4>
           <ul>
-            {stateStories.map(story => (
-              <li key={story.id}>
-                <strong>{story.name}</strong>: {story.description} - Priorytet: {story.priority} 
-                {story.state=="doing" && (<div>-Data rozpoczecia: {story.startDate} </div>
-                )}  
-                {story.state=="done" && (<div>-Data zakończenia: {story.completedDate} </div>
-                )}                
-                -
-
+            {stateTasks.map(task => (
+              <li key={task.id}>
+                <strong>{task.name}</strong>: {task.description} - Priorytet: {task.priority}
+                {task.state === "doing" && <div>- Start: {task.startDate}</div>}
+                {task.state === "done" && <div>- Zakończenie: {task.completedDate}</div>}
                 {state !== "done" && (
-                  <div>
-                    <button
-                      onClick={() => onUpdateStoryState(
-                        story,
-                        state === "to do" ? "doing" : "done"
-                      )}
-                      disabled={state === "doing" && !story.assignedUserId}
-                    >
-                      Przenieś do {state === "to do" ? "Doing" : "Done"}
-                    </button>
-                  </div>
+                  <button onClick={() => onUpdateTaskState(task, state === "to do" ? "doing" : "done")}>
+                    Przenieś do {state === "to do" ? "Doing" : "Done"}
+                  </button>
+                  
                 )}
+                <button onClick={() => editTask(task.id)}>Edytuj</button>
+                <button onClick={() => deleteTask(task.id)}>Usuń</button>
               </li>
             ))}
           </ul>
