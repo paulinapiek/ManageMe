@@ -1,6 +1,6 @@
 import React from "react";
 import { UserManager } from "./UserManager";
-
+import GetApiToken from "./ApiToken";
 const UserProfile = () => {
   const userManager = new UserManager();
   const user = userManager.getUser();
@@ -20,8 +20,10 @@ const UserProfile = () => {
       <h2>Zalogowany użytkownik:</h2>
       <p>Imię i nazwisko: {user.firstName} {user.lastName}</p>
       <p>Rola: {user.role}</p>
+      <GetApiToken />
     </div>
   );
+
 };
 
 export default UserProfile;
