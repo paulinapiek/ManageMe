@@ -1,16 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { UserManager } from "./UserManager";
-import GetApiToken from "./ApiToken";
+import LoginForm from "./LoginForm";
+
 const UserProfile = () => {
   const userManager = new UserManager();
-  const user = userManager.getUser();
+  const [user, setUser] = useState<any>(null); // Początkowy stan to `null`
+
+  // Pobierz użytkownika po załadowaniu komponentu
+  useEffect(() => {
+    const fetchUser = async () => {
+      const currentUser = await userManager.getUser(); // Oczekiwanie na rozwiązanie Promise
+      setUser(currentUser);
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleLoginSuccess = async (token: string, refreshToken: string) => {
+    localStorage.setItem("token", token);
+   
+    const currentUser = await userManager.getUser(); // Pobranie użytkownika po zalogowaniu
+    setUser(currentUser);
+    console.log("Zalogowano pomyślnie:", { token, refreshToken });
+  };
 
   if (!user) {
-    // Fallback UI when no user is found
     return (
       <div>
-        <h2>Brak zalogowanego użytkownika</h2>
-        <p>Proszę zalogować się, aby zobaczyć szczegóły użytkownika.</p>
+        <LoginForm onLoginSuccess={handleLoginSuccess} />
       </div>
     );
   }
@@ -20,10 +37,8 @@ const UserProfile = () => {
       <h2>Zalogowany użytkownik:</h2>
       <p>Imię i nazwisko: {user.firstName} {user.lastName}</p>
       <p>Rola: {user.role}</p>
-      <GetApiToken />
-    </div>
+       </div>
   );
-
 };
 
 export default UserProfile;
