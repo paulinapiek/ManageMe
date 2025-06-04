@@ -7,7 +7,7 @@ const GetApiToken= () => {
   const handleRequest = async () => {
     try {
       const res = await axios.post("http://localhost:3000/token", {
-        // Dane, które chcesz wysłać w body
+      // Dane, które chcesz wysłać w body
        // key: "value",
       });
 

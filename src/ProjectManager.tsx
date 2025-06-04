@@ -1,34 +1,45 @@
 import React, { useState, useEffect } from "react";
+import "./ProjectManager.css"; 
 
-import { LocalStorageAPI } from "./LocalStorageAPI";
+
+import { db, getDocument } from "./firebaseWrapper";
+import { collection, getDocs, addDoc, deleteDoc, doc, getDoc} from "firebase/firestore";
 import { Project } from "./Project";
 import StoryList from "./StoryList";
 import ActiveProject from "./ActiveProjects";
 
 const ProjectManager = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const api = new LocalStorageAPI();
-  const [name, setName] = useState<string>(""); // State for project name
+   const [name, setName] = useState<string>(""); // State for project name
   const [description, setDescription] = useState<string>("");
   
 
   useEffect(() => {
-    setProjects(api.getProjects());
+   
+    fetchData();
   }, []);
+const fetchData = async () => {
+      const querySnapshot = await getDocs(collection(db, "projects"));
+        querySnapshot.docs.forEach((doc) => console.log("ID projektu:", doc.id));
+      setProjects(querySnapshot.docs.map(doc => doc.data() as Project));
+    };
 
-  const handleAddProject = () => {
+  const handleAddProject = async () => {
     const newProject: Project = {
       id: Date.now().toString(),
       name: name,
       description: description
     };
-    api.addProject(newProject);
-    setProjects(api.getProjects());
+    await addDoc(collection(db, "projects"),  newProject);
+    fetchData()
   };
 
-  const handleDeleteProject = (id: string) => {
-    api.deleteProject(id);
-    setProjects(api.getProjects());
+  const handleDeleteProject = async (id: string) => {
+    const documentId = await getDocument(id, "projects");
+    await deleteDoc(doc(db, "projects", documentId));
+    await fetchData()
+    // api.deleteProject(id);
+    // setProjects(api.getProjects());
   };
 
  
