@@ -1,112 +1,91 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Story } from "./Story";
 import { Task } from "./Task";
+import { db, getDocument } from "./firebaseWrapper";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where} from "firebase/firestore";
 
-// Define the context for StoryManager
+// Tworzymy kontekst StoryManager
 const StoryContext = createContext<{
   stories: Story[];
   tasks: Task[];
-  fetchStories: () => void;
-  fetchTasks: () => void;
-  addStory: (story: Story) => void;
-  addTask: (task: Task) => void;
-  updateStory: (story: Story) => void;
-  updateTask: (task: Task, state: "to do" | "doing" | "done") => void;
-  deleteStory: (storyId: string) => void;
-  deleteTask: (taskId: string) => void;
+  fetchStories: () => Promise<void>;
+  fetchTasks: () => Promise<void>;
+  addStory: (story: Story) => Promise<void>;
+  addTask: (task: Task) => Promise<void>;
+  updateStory: (story: Story) => Promise<void>;
+  updateTask: (task: Task, state: "to do" | "doing" | "done") => Promise<void>;
+  deleteStory: (storyId: string) => Promise<void>;
+  deleteTask: (taskId: string) => Promise<void>;
 } | null>(null);
 
 export const StoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [stories, setStories] = useState<Story[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const storyKey = "stories";
-  const taskKey = "tasks";
 
-  // Fetch all stories from storage
-  const fetchStories = () => {
-    const data = localStorage.getItem(storyKey);
-    const result = data ? JSON.parse(data) : [];
-    setStories(result);
-    return result;
+  // Pobieranie wszystkich historyjek z Firestore
+  const fetchStories = async () => {
+    const querySnapshot = await getDocs(collection(db, "stories"));
+    setStories(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Story)));
   };
 
-  // Fetch all tasks from storage
-  const fetchTasks = () => {
-    const data = localStorage.getItem(taskKey);
-    const result = data ? JSON.parse(data) : [];
-    setTasks(result);
-    return result;
+  // Pobieranie wszystkich zadań z Firestore
+  const fetchTasks = async () => {
+    const querySnapshot = await getDocs(collection(db, "tasks"));
+    setTasks(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task)));
   };
 
-  // Add a new story
-  const addStory = (newStory: Story) => {
-    const stories = fetchStories();
-    stories.push(newStory);
-    localStorage.setItem(storyKey, JSON.stringify(stories));
-    setStories(stories);
+  // Dodawanie nowej historyjki do Firestore
+  const addStory = async (newStory: Story) => {
+    const docRef = await addDoc(collection(db, "stories"), newStory);
+    const { id, ...storyData } = newStory;
+    setStories(prev => [...prev, { id: docRef.id, ...storyData }]);
   };
 
-  // Add a new task
-  const addTask = (newTask: Task) => {
-    const tasks = fetchTasks();
-    tasks.push(newTask);
-    localStorage.setItem(taskKey, JSON.stringify(tasks));
+  // Dodawanie nowego zadania do Firestore
+  const addTask = async (newTask: Task) => {
+    const docRef = await addDoc(collection(db, "tasks"), newTask);
+    const { id, ...taskData } = newTask;
+    setTasks(prev => [...prev, { id: docRef.id, ...taskData }]);
   };
 
-  // Update a story
-  const updateStory = (updatedStory: Story) => {
-    const stories = (fetchStories()).map((story: { id: string; }) => {
-       if (story.id === updatedStory.id) {
-      //   if (state === "doing" && !updatedStory.startDate) {
-      //     updatedStory.state = "doing";
-      //     updatedStory.startDate = new Date().toISOString();
-      //   }
-      //   if (state === "done" && !updatedStory.completedDate) {
-      //     updatedStory.state = "done";
-      //     updatedStory.completedDate = new Date().toISOString();
-      //   }
-         return updatedStory;
-      }
-      return story;
+  // Aktualizacja historyjki w Firestore
+  const updateStory = async (updatedStory: Story) => {
+      const documentId = await getDocument(updatedStory.id, "stories");
+    const docRef = doc(db, "stories", documentId);
+    const { id, ...storyData } = updatedStory;
+    await updateDoc(docRef, storyData);
+    await fetchStories(); 
+   // setStories(prev => prev.map(story => (story.id === updatedStory.id ? updatedStory : story)));
+  };
+
+  // Aktualizacja zadania w Firestore
+  const updateTask = async (updatedTask: Task, state: "to do" | "doing" | "done") => {
+    const docRef = doc(db, "tasks", updatedTask.id);
+    await updateDoc(docRef, { state });
+    setTasks(prev => prev.map(task => (task.id === updatedTask.id ? { ...updatedTask, state } : task)));
+  };
+
+  // Usuwanie historyjki z Firestore
+  const deleteStory = async (storyId: string) => {
+     const documentId = await getDocument(storyId, "stories");
+    const docRef = doc(db, "stories", documentId);
+    await deleteDoc(docRef);
+    setStories(prev => prev.filter(story => story.id !== storyId));
+
+    // Usuwanie powiązanych zadań
+    const q = query(collection(db, "tasks"), where("storyId", "==", storyId));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (taskDoc) => {
+      await deleteDoc(doc(db, "tasks", taskDoc.id));
     });
-    localStorage.setItem(storyKey, JSON.stringify(stories));
-    setStories(stories);
-
+    setTasks(prev => prev.filter(task => task.storyId !== storyId));
   };
 
-  // Update a task
-  const updateTask = (updatedTask: Task, state: "to do" | "doing" | "done") => {
-    const tasks = (fetchTasks()).map((task: { id: string; }) => {
-      if (task.id === updatedTask.id) {
-        if (state === "doing" && !updatedTask.startDate) {
-          updatedTask.state = "doing";
-          updatedTask.startDate = new Date().toISOString();
-        }
-        if (state === "done" && !updatedTask.completedDate) {
-          updatedTask.state = "done";
-          updatedTask.completedDate = new Date().toISOString();
-        }
-        return updatedTask;
-      }
-      return task;
-    });
-    localStorage.setItem(taskKey, JSON.stringify(tasks));
-  };
-
-  // Delete a story and its associated tasks
-  const deleteStory =  (storyId: string) => {
-    const stories = (fetchStories()).filter((story: { id: string; }) => story.id !== storyId);
-    localStorage.setItem(storyKey, JSON.stringify(stories));
-
-    const tasks = (fetchTasks()).filter((task: { storyId: string; }) => task.storyId !== storyId);
-    localStorage.setItem(taskKey, JSON.stringify(tasks));
-    setStories(stories);
-  };
-
-  // Delete a task
-  const deleteTask = (taskId: string) => {
-    const tasks = fetchTasks().filter((task: { id: string; }) => task.id !== taskId);
-    localStorage.setItem(taskKey, JSON.stringify(tasks));
+  // Usuwanie zadania z Firestore
+  const deleteTask = async (taskId: string) => {
+    const docRef = doc(db, "tasks", taskId);
+    await deleteDoc(docRef);
+    setTasks(prev => prev.filter(task => task.id !== taskId));
   };
 
   return (

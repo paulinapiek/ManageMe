@@ -3,7 +3,7 @@ import "./ProjectManager.css";
 
 
 import { db, getDocument } from "./firebaseWrapper";
-import { collection, getDocs, addDoc, deleteDoc, doc, getDoc} from "firebase/firestore";
+import { collection, getDocs, addDoc, deleteDoc, doc, getDoc, updateDoc} from "firebase/firestore";
 import { Project } from "./Project";
 import StoryList from "./StoryList";
 import ActiveProject from "./ActiveProjects";
@@ -20,7 +20,6 @@ const ProjectManager = () => {
   }, []);
 const fetchData = async () => {
       const querySnapshot = await getDocs(collection(db, "projects"));
-        querySnapshot.docs.forEach((doc) => console.log("ID projektu:", doc.id));
       setProjects(querySnapshot.docs.map(doc => doc.data() as Project));
     };
 
@@ -41,6 +40,14 @@ const fetchData = async () => {
     // api.deleteProject(id);
     // setProjects(api.getProjects());
   };
+  const updateProject = async (id: string, updatedData: Partial<Project>) => {
+  const documentId = await getDocument(id, "projects");
+  const docRef = doc(db, "projects", documentId);
+  await updateDoc(docRef, updatedData);
+  await fetchData();
+  console.log(`Projekt o ID ${id} został zaktualizowany.`);
+};
+
 
  
   return (
@@ -64,7 +71,8 @@ const fetchData = async () => {
           <li key={project.id}>
             <strong>{project.name}</strong>: {project.description}
             <button onClick={() => handleDeleteProject(project.id)}>Usuń</button>
-           
+            <button onClick={() => updateProject(project.id, { name, description })}>Zaktualizuj</button>
+
           </li>
         ))}
       </ul>

@@ -9,13 +9,15 @@ const TaskList = ({ storyId }: { storyId: string }) => {
   const taskManager = new TaskManager();
 
   useEffect(() => {
-    const allTasks = taskManager.getTasksByStoryId(storyId);
-    setTasks(allTasks);
+  fetchData();
   }, [storyId]);
-
+  const fetchData = async () => {
+    const allTasks = await taskManager.getTasksByStoryId(storyId);
+    setTasks(allTasks);
+  };
   const filteredTasks = tasks.filter((task) => filter === "all" || task.state === filter);
 
-  const addTask = (): void => {
+  const addTask = async (): Promise <void> => {
     const newTask: Task = {
       id: Date.now().toString(),
       name:  "Nowe zadanie",
@@ -27,21 +29,21 @@ const TaskList = ({ storyId }: { storyId: string }) => {
       state:  "to do",
     };
     taskManager.addTask(newTask);
-    setTasks(taskManager.getTasksByStoryId(storyId));
+    setTasks(await taskManager.getTasksByStoryId(storyId));
   };
 
-    function UpdateState(task: Task, newState: "to do" | "doing" | "done"): void {
-        taskManager.updateTask(task, newState);
-        setTasks(taskManager.getTasksByStoryId(storyId));
+   const UpdateState = async (task: Task, newState: "to do" | "doing" | "done"): Promise<void> => {
+        await taskManager.updateTask(task, newState);
+        setTasks(await taskManager.getTasksByStoryId(storyId));
     }
 
-    function editTask(taskId: string): void {
+    const editTask = async (taskId: string): Promise<void> => {
         throw new Error("Function not implemented.");
     }
 
-    function deleteTask(taskId: string): void {
-        taskManager.deleteTask(taskId);
-        setTasks(taskManager.getTasksByStoryId(storyId));
+    const deleteTask = async (taskId: string): Promise<void> => {
+        await taskManager.deleteTask(taskId);
+        setTasks(await taskManager.getTasksByStoryId(storyId));
     }
 
   return (

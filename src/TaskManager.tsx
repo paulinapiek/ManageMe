@@ -1,49 +1,48 @@
 import { Task } from "./Task";
+import { db , getDocument} from "./firebaseWrapper";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from "firebase/firestore";
 
 export class TaskManager {
-  private key: string = "tasks";
+  private tasksCollection = collection(db, "tasks");
 
-  // Pobierz wszystkie zadania z localStorage
-  getTasks(): Task[] {
-    const data = localStorage.getItem(this.key);
-    return data ? JSON.parse(data) : [];
+  // Pobierz wszystkie zadania z Firestore
+  async getTasks(): Promise<Task[]> {
+    const querySnapshot = await getDocs(this.tasksCollection);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
   }
 
   // Pobierz zadania powiązane z daną historyjką
-  getTasksByStoryId(storyId: string): Task[] {
-    return this.getTasks().filter((task) => task.storyId === storyId);
+  async getTasksByStoryId(storyId: string): Promise<Task[]> {
+    const q = query(this.tasksCollection, where("storyId", "==", storyId));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
   }
 
   // Dodaj nowe zadanie
-  addTask(task: Task): void {
-    const tasks = this.getTasks();
-    tasks.push(task);
-    localStorage.setItem(this.key, JSON.stringify(tasks));
+  async addTask(task: Task): Promise<void> {
+    await addDoc(this.tasksCollection, task);
   }
 
   // Zaktualizuj zadanie
-  updateTask(updatedTask: Task, state: "to do" | "doing" | "done"): void {
-    const tasks = this.getTasks().map((task) =>
-        {
-            if (task.id === updatedTask.id) {
-              if (state === "doing" && !updatedTask.startDate) {
-                updatedTask.state = "doing";
-                updatedTask.startDate = new Date().toISOString();
-              }
-              if (state === "done" && !updatedTask.completedDate) {
-                updatedTask.state = "done";
-                updatedTask.completedDate = new Date().toISOString();
-              }
-              return updatedTask;
-            }
-      return task
-  });
-    localStorage.setItem(this.key, JSON.stringify(tasks));
+  async updateTask(updatedTask: Task, state: "to do" | "doing" | "done"): Promise<void> {
+    const documentId = await getDocument(updatedTask.id, "tasks");
+    const docRef = doc(db, "tasks", documentId);
+    const updateData: Partial<Task> = { state };
+
+    if (state === "doing" && !updatedTask.startDate) {
+      updateData.startDate = new Date().toISOString();
+    }
+    if (state === "done" && !updatedTask.completedDate) {
+      updateData.completedDate = new Date().toISOString();
+    }
+
+    await updateDoc(docRef, updateData);
   }
 
   // Usuń zadanie
-  deleteTask(taskId: string): void {
-    const tasks = this.getTasks().filter((task) => task.id !== taskId);
-    localStorage.setItem(this.key, JSON.stringify(tasks));
+  async deleteTask(taskId: string): Promise<void> {
+    const documentId = await getDocument(taskId, "tasks");
+    const docRef = doc(db, "tasks", documentId);
+    await deleteDoc(docRef);
   }
 }

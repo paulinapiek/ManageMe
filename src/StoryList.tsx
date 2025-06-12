@@ -16,10 +16,14 @@ const StoryList = ({ projectId }: { projectId: string }) => {
  
 
   useEffect(() => {
-    storyManager.fetchStories();
-    const allStories = storyManager.stories;
-    setStories(allStories.filter((story: { projectId: string; }) => story.projectId === projectId));
+   fetchData();
   }, [projectId]);
+   const fetchData = async () => { storyManager.fetchStories();
+    const allStories = storyManager.stories;
+    for (const story of allStories) {console.log(story); }
+    setStories(allStories.filter((story: { projectId: string; }) => story.projectId === projectId));
+    };
+
 
   const addStory = (): void => {
     if (!newStory.name || !newStory.description) {
@@ -43,14 +47,15 @@ const StoryList = ({ projectId }: { projectId: string }) => {
     setStories(allStories.filter((story: { projectId: string; }) => story.projectId === projectId));
   };
 
-  const deleteStory = (id: string): void => {
+  const deleteStory = async (id: string): Promise<void> => {
     const confirmed = window.confirm("Czy na pewno chcesz usunąć tę historyjkę?");
     if (confirmed) {
-      storyManager.deleteStory(id);
-      storyManager.fetchStories();
+      await storyManager.deleteStory(id);
+      await storyManager.fetchStories();
       const allStories = storyManager.stories;
       setStories(allStories.filter((story: { projectId: string; }) => story.projectId === projectId));
     }
+    
   };
 
   const editStory = (id: string): void => {
@@ -59,6 +64,7 @@ const StoryList = ({ projectId }: { projectId: string }) => {
       setNewStory(storyToEdit);
       setEditStoryId(id);
       storyManager.updateStory(storyToEdit)
+      
     }
   };
 
@@ -68,8 +74,9 @@ const StoryList = ({ projectId }: { projectId: string }) => {
       storyManager.updateStory(updatedStory);
       setEditStoryId(null);
       setNewStory({ name: "", description: "", priority: "low", state: "to do" });
-      const allStories = storyManager.stories;
-      setStories(allStories.filter((story: { projectId: string; }) => story.projectId === projectId)); 
+      fetchData();
+     // const allStories = storyManager.stories;
+      //setStories(allStories.filter((story: { projectId: string; }) => story.projectId === projectId)); 
     }
   };
 
