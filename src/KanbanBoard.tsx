@@ -4,9 +4,11 @@ import "./KanbanBoard.css"; // Import the CSS file
 
 interface KanbanBoardProps {
   tasks: Task[];
-  onUpdateTaskState: (task: Task, newState: "to do" | "doing" | "done") => void;
-  editTask: (taskId: string) => void;
-  deleteTask: (taskId: string) => void;
+  onUpdateTaskState: (task: Task, newState: "to do" | "doing" | "done") => Promise<void>;
+  //editTask: (taskId: string) => void;
+  editTask: (task: Task) => Promise<void>;
+  deleteTask: (taskId: string) => Promise<void>;
+ 
 }
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onUpdateTaskState, editTask, deleteTask }) => {
@@ -32,7 +34,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onUpdateTaskState, edi
                     Przenieś do {state === "to do" ? "Doing" : "Done"}
                   </button>
                 )}
-                <button onClick={() => editTask(task.id)}>Edytuj</button>
+                {/* <button onClick={() => editTask(task.id)}>Edytuj</button> */}
+                <button onClick={() => editTask(task)}>Edytuj</button>
+
                 <button className="delete" onClick={() => deleteTask(task.id)}>Usuń</button>
               </li>
             ))}

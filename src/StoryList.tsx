@@ -18,7 +18,8 @@ const StoryList = ({ projectId }: { projectId: string }) => {
   useEffect(() => {
    fetchData();
   }, [projectId]);
-   const fetchData = async () => { storyManager.fetchStories();
+   const fetchData = async () => { 
+    await storyManager.fetchStories();
     const allStories = storyManager.stories;
     for (const story of allStories) {console.log(story); }
     setStories(allStories.filter((story: { projectId: string; }) => story.projectId === projectId));

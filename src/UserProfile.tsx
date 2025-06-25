@@ -18,7 +18,6 @@ const UserProfile = () => {
 
   const handleLoginSuccess = async (token: string, refreshToken: string) => {
     localStorage.setItem("token", token);
-   
     const currentUser = await userManager.getUser(); // Pobranie użytkownika po zalogowaniu
     setUser(currentUser);
     console.log("Zalogowano pomyślnie:", { token, refreshToken });

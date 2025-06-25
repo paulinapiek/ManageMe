@@ -45,4 +45,13 @@ export class TaskManager {
     const docRef = doc(db, "tasks", documentId);
     await deleteDoc(docRef);
   }
+   async editTask(task: Task) : Promise<void> {
+        const documentId = await getDocument(task.id, "tasks");
+      const docRef = doc(db, "tasks", documentId);
+      const { id, ...taskData } = task;
+      await updateDoc(docRef, taskData);
+      
+     
+    };
+  
 }
