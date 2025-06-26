@@ -125,34 +125,7 @@ const [editTaskId, setEditTaskId] = useState<string | null>(null);
       <option value="midium">Średni</option>
       <option value="high">Wysoki</option>
     </select>
-    <select
-      value={newTask.state || "to do"}
-      onChange={(e) => setNewTask({ ...newTask, state: e.target.value as "to do" | "doing" | "done" })}
-    >
-      <option value="to do">Do zrobienia</option>
-      <option value="doing">W trakcie</option>
-      <option value="done">Zamknięte</option>
-    </select>
-    <br></br><label>Data rozpoczęcia:</label>
-    <input
-      type="datetime-local"
-      placeholder="Data rozpoczęcia"
-      value={newTask.startDate || ""}
-      onChange={(e) => setNewTask({ ...newTask, startDate: e.target.value })}
-    />
-    <input
-      type="datetime-local"
-      placeholder="Data zakończenia"
-      value={newTask.completedDate || ""}
-      onChange={(e) => setNewTask({ ...newTask, completedDate: e.target.value })}
-    />
-    <input
-      type="text"
-      placeholder="ID przypisanego użytkownika"
-      value={newTask.assignedUserId || ""}
-      onChange={(e) => setNewTask({ ...newTask, assignedUserId: e.target.value })}
-    />
-    {editTaskId ? (
+     {editTaskId ? (
       <>
         <button onClick={saveEditedTask}>Zapisz Zmiany</button>
         <button onClick={cancelEdit}>Anuluj</button>
@@ -160,6 +133,8 @@ const [editTaskId, setEditTaskId] = useState<string | null>(null);
     ) : (
       <button onClick={addTask}>Dodaj Zadanie</button>
     )}
+
+
   </div>
       <KanbanBoard tasks={tasks} onUpdateTaskState={updateState} editTask={editTask} deleteTask={deleteTask}/>
  

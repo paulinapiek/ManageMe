@@ -1,9 +1,11 @@
 import { Task } from "./Task";
 import { db , getDocument} from "./firebaseWrapper";
+import { UserManager } from "./UserManager";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from "firebase/firestore";
 
 export class TaskManager {
   private tasksCollection = collection(db, "tasks");
+  userManager = new UserManager();
 
   // Pobierz wszystkie zadania z Firestore
   async getTasks(): Promise<Task[]> {
@@ -30,6 +32,7 @@ export class TaskManager {
     const updateData: Partial<Task> = { state };
 
     if (state === "doing" && !updatedTask.startDate) {
+      updateData.assignedUserId = this.userManager.getUser()?.id || "";
       updateData.startDate = new Date().toISOString();
     }
     if (state === "done" && !updatedTask.completedDate) {

@@ -1,6 +1,7 @@
 import React from "react";
 import { Task } from "./Task";
 import "./KanbanBoard.css"; // Import the CSS file
+import { UserManager } from "./UserManager";
 
 interface KanbanBoardProps {
   tasks: Task[];
@@ -12,6 +13,8 @@ interface KanbanBoardProps {
 }
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onUpdateTaskState, editTask, deleteTask }) => {
+  const userManager = new UserManager();
+  const currentUser = userManager.getUser();
   const groupedTasks = {
     "to do": tasks.filter(task => task.state === "to do"),
     doing: tasks.filter(task => task.state === "doing"),
@@ -28,10 +31,19 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onUpdateTaskState, edi
               <li key={task.id}>
                 <strong>{task.name}</strong>: {task.description} - Priorytet: {task.priority}
                 {task.state === "doing" && <div>- Start: {task.startDate}</div>}
-                {task.state === "done" && <div>- Zakończenie: {task.completedDate}</div>}
-                {state !== "done" && (
-                  <button onClick={() => onUpdateTaskState(task, state === "to do" ? "doing" : "done")}>
-                    Przenieś do {state === "to do" ? "Doing" : "Done"}
+                {task.state === "done" && <div>- Start: {task.startDate}- Zakończenie: {task.completedDate}</div>}
+                                {
+                 (task.state === "doing" && currentUser?.id === task.assignedUserId) 
+                 && (
+                  <button onClick={() => onUpdateTaskState(task, "done")}>
+                    Przenieś do {"Done"}
+                  </button>
+                )}
+              {
+                 (task.state === "to do" && currentUser?.role !== "admin")
+                 && (
+                  <button onClick={() => onUpdateTaskState(task,  "doing" )}>
+                    Przenieś do {"Doing"}
                   </button>
                 )}
                 {/* <button onClick={() => editTask(task.id)}>Edytuj</button> */}

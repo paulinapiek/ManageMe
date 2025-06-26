@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { User } from "./UserManager";
 
-const LoginForm: React.FC<{ onLoginSuccess: (token: string, refreshToken: string) => void }> = ({ onLoginSuccess }) => {
+const LoginForm: React.FC<{ onLoginSuccess: (token: string, refreshToken: string, user: User) => Promise<void>}> = ({ onLoginSuccess }) => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
 
@@ -21,7 +22,8 @@ const LoginForm: React.FC<{ onLoginSuccess: (token: string, refreshToken: string
       }
 
       const data = await response.json();
-      onLoginSuccess(data.token, data.refreshToken);
+      onLoginSuccess(data.token, data.refreshToken, data.user);
+      // kim unzytkownik jest zalogowany, można pobrać jego dane
     } catch (error) {
       console.error("Błąd logowania:", error);
     }
