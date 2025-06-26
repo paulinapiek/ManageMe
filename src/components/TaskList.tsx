@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Task } from "./Task";
-import { TaskManager } from "./TaskManager";
+import { Task } from "../models/Task";
+import { TaskManager } from "../services/TaskManager";
 import KanbanBoard from "./KanbanBoard";
 
 

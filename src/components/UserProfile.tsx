@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import LoginForm from "./LoginForm";
-import { User } from "./UserManager"; 
+import { User } from "../services/UserManager"; 
 
 const UserProfile = () => {
   const [user, setUser] = useState<User | null>(null); // Początkowy stan to `null`

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { ProjectManager2 } from './ProjectManager2';
+import { ProjectManager2 } from '../components/ProjectManager2';
 
 test('ProjectManager stores and retrieves the active project correctly', () => {
   const projectManager = new ProjectManager2();

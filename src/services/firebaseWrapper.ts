@@ -1,8 +1,8 @@
 import { getFirestore, collection, addDoc, getDocs, connectFirestoreEmulator, query, limit, where } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import { Project } from "./Project" ;
-import { Story } from "./Story";
-import { Task } from "./Task";
+import { Project } from "../models/Project" ;
+import { Story } from "../models/Story";
+import { Task } from "../models/Task";
 
 const firebaseConfig = {
   projectId: "local-emulator"

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import "./ProjectManager.css"; 
+import "./styles/ProjectManager.css"; 
 
 
-import { db, getDocument } from "./firebaseWrapper";
+import { db, getDocument } from "../services/firebaseWrapper";
 import { collection, getDocs, addDoc, deleteDoc, doc, getDoc, updateDoc} from "firebase/firestore";
-import { Project } from "./Project";
+import { Project } from "../models/Project";
 import StoryList from "./StoryList";
 import ActiveProject from "./ActiveProjects";
 

@@ -1,4 +1,4 @@
-import { Task } from "./Task";
+import { Task } from "../models/Task";
 import { db , getDocument} from "./firebaseWrapper";
 import { UserManager } from "./UserManager";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from "firebase/firestore";

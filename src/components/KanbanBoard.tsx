@@ -1,7 +1,7 @@
 import React from "react";
-import { Task } from "./Task";
-import "./KanbanBoard.css"; // Import the CSS file
-import { UserManager } from "./UserManager";
+import { Task } from "../models/Task";
+import "./styles/KanbanBoard.css"; // Import the CSS file
+import { UserManager } from "../services/UserManager";
 
 interface KanbanBoardProps {
   tasks: Task[];

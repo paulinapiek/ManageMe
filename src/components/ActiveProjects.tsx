@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Project } from "./Project";
+import { Project } from "../models/Project";
 import {ProjectManager2} from "./ProjectManager2";
 import StoryList from "./StoryList";
 import KanbanBoard from "./KanbanBoard";

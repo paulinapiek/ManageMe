@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User } from "./UserManager";
+import { User } from "../services/UserManager";
 
 const LoginForm: React.FC<{ onLoginSuccess: (token: string, refreshToken: string, user: User) => Promise<void>}> = ({ onLoginSuccess }) => {
   const [login, setLogin] = useState("");

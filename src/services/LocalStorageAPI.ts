@@ -1,4 +1,4 @@
-import { Project } from "./Project";
+import { Project } from "../models/Project";
 
 export class LocalStorageAPI {
     private key: string = "projects";

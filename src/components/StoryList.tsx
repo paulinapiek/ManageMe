@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Story } from "./Story";
-import { useStoryManager } from "./StoryManager";
+import { Story } from "../models/Story";
+import { useStoryManager } from "../services/StoryManager";
 import  TaskList  from "./TaskList";
+import { UserManager } from "../services/UserManager";
 
 const StoryList = ({ projectId }: { projectId: string }) => {
   const [stories, setStories] = useState<Story[]>([]);
@@ -13,7 +14,7 @@ const StoryList = ({ projectId }: { projectId: string }) => {
   });
   const [editStoryId, setEditStoryId] = useState<string | null>(null);
   const storyManager = useStoryManager();
- 
+ const userManager = new UserManager();
 
   useEffect(() => {
    fetchData();
@@ -39,7 +40,7 @@ const StoryList = ({ projectId }: { projectId: string }) => {
       projectId: projectId,
       createdAt: new Date().toISOString(),
       state: newStory.state as "to do" | "doing" | "done",
-      ownerId: "Jan Kowalski", // Domyślna wartość
+      ownerId: userManager.getUser()?.id || "",
     };
 
     storyManager.addStory(createStory);

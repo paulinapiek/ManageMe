@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Story } from "./Story";
+import { Story } from "../models/Story";
 import { db, getDocument } from "./firebaseWrapper";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where} from "firebase/firestore";
 
